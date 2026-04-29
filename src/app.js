@@ -1,27 +1,21 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
+const User = require("./models/user");
 
-const { adminAuth } = require("./middlewares/auth");
+app.post("/signup", async (req, res) => {
+  const user = new User({
+    firstName: "Pavitra",
+    lastName: "patil",
+    emailId: "pavvi@g.com",
+    password: "234",
+  });
 
-app.use("/admin", adminAuth);
-
-app.use("/admin/test", (req, res) => {
-  res.send("Hello from the server");
-});
-
-app.use("/hello", (req, res) => {
-  res.send("Hello ha hi");
-});
-
-app.get("/user/:userId/:name/:password", (req, res) => {
-  console.log(req.params);
-  res.send({ firstname: "abc", lastName: "xyz" });
-});
-
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    res.status(500).send("Something went wrong!");
+  try {
+    await user.save();
+    res.status(201).send("User Created successfully", user);
+  } catch (err) {
+    res.status(400).send("Error occured ", err.message);
   }
 });
 
