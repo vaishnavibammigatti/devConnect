@@ -16,7 +16,7 @@ app.post("/signup", async (req, res) => {
 });
 
 //get user by emailId
-app.get("/getUserByEmailId", async (req, res) => {
+app.get("/user/getUserByEmailId", async (req, res) => {
   try {
     const user = await User.find({ emailId: req.body.emailId });
     if (user.length === 0) {
@@ -39,9 +39,22 @@ app.get("/users", async (req, res) => {
   }
 });
 
-app.patch("/patchUser", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   try {
+    const ALLOWED_UPDATES = ["age", "gender", "about", "skills", "photoUrl"];
+
+    const isUpdateAllowed = Object.keys(req.body).every((k) =>
+      ALLOWED_UPDATES.includes(k),
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+
+    if (req.body?.skills?.length > 10) {
+      throw new Error("skills cannot be more than 10");
+    }
+    
     const user = await User.findByIdAndUpdate(userId, req.body, {
       returnDocument: "after",
       runValidators: true,
@@ -52,7 +65,7 @@ app.patch("/patchUser", async (req, res) => {
   }
 });
 
-app.delete("/deleteUser", async (req, res) => {
+app.delete("/user/deleteUser", async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.body.userId);
     res.status(204).send("Deleted sucessully" + user);

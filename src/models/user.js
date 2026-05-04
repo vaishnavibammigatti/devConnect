@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,10 +18,20 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invali email" + value);
+        }
+      },
     },
     password: {
       type: String,
       required: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a strong password " + value);
+        }
+      },
     },
     age: {
       type: Number,
@@ -38,6 +49,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default:
         "https://img.magnific.com/premium-vector/default-avatar-profile-icon-gray-placeholder-vector-illustration_514344-14757.jpg?semt=ais_hybrid&w=740&q=80",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid photourl" + value);
+        }
+      },
     },
     about: {
       type: String,
