@@ -45,15 +45,16 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid Email");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
+    const isPasswordValid = await user.validatePassword(password);
     if (isPasswordValid) {
       //Create a JWT token
 
-      const token = jwt.sign({ _id: user._id }, "devConnect123");
+      const token = await user.getJWT();
 
       //Add the token to cookie and send thh response back to the user
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
 
       res.send("Login successful!!");
     } else {
@@ -71,6 +72,10 @@ app.get("/profile", userAuth, async (req, res) => {
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
+});
+
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  res.send(req.user.firstName + " sent the connection request");
 });
 
 connectDB()
