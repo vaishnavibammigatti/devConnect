@@ -20,12 +20,6 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 
-
-
-app.post("/sendConnectionRequest", userAuth, async (req, res) => {
-  res.send(req.user.firstName + " sent the connection request");
-});
-
 connectDB()
   .then(() => {
     console.log("Database connection established... ");
